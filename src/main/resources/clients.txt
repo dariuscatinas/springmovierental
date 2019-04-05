@@ -1,0 +1,5 @@
+1232,Costel,costel@scs.ubbcluj.ro,15
+4432,George,george@scs.ubbcluj.ro,29
+3456,Cornel,cornel@cs.ubb,35
+1234,Dinu,dinu@cs.ubb,22
+4456,Tutu,tutu@cs.ubbcluj.ro,54

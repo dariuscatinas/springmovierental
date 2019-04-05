@@ -1,0 +1,6 @@
+rootProject.name = 'catalog'
+rootProject.name = 'movierental'
+include 'common'
+include 'server'
+include 'client'
+
