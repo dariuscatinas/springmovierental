@@ -2,9 +2,11 @@ package config;
 
 import common.service.RentalService;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import service.Client_RentalService;
 
+@Configuration
 public class Client_RentalAppConfig {
 
     @Bean
@@ -13,7 +15,7 @@ public class Client_RentalAppConfig {
     }
 
     @Bean
-    RmiProxyFactoryBean rmiProxyFactoryBean(){
+    RmiProxyFactoryBean rmiProxyFactoryBeanRental(){
         RmiProxyFactoryBean rmiProxyFactoryBean = new RmiProxyFactoryBean();
         rmiProxyFactoryBean.setServiceInterface(RentalService.class);
         rmiProxyFactoryBean

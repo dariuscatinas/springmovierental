@@ -1,6 +1,4 @@
-import config.Server_ClientAppConfig;
-import config.Server_MovieAppConfig;
-import config.Server_RentalAppConfig;
+import config.ServerConfig;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class MainServer {
@@ -8,9 +6,7 @@ public class MainServer {
 
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext();
-        context.register(Server_ClientAppConfig.class);
-        context.register(Server_MovieAppConfig.class);
-        context.register(Server_RentalAppConfig.class);
+        context.register(ServerConfig.class);
         context.refresh();
         System.out.println("server start...");
 

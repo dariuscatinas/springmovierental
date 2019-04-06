@@ -26,7 +26,7 @@ public class Server_ClientService implements ClientService {
     }
 
     public Server_ClientService() {
-        System.out.println("empty client constructor");
+//        System.out.println("empty client constructor");
     }
 
     public Server_ClientService(Repository<Long,Client> repo){

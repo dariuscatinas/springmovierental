@@ -2,9 +2,11 @@ package config;
 
 import common.service.ClientService;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import service.Client_ClientService;
 
+@Configuration
 public class Client_ClientAppConfig {
 
     @Bean
@@ -13,7 +15,7 @@ public class Client_ClientAppConfig {
     }
 
     @Bean
-    RmiProxyFactoryBean rmiProxyFactoryBean() {
+    RmiProxyFactoryBean rmiProxyFactoryBeanClient() {
         RmiProxyFactoryBean rmiProxyFactoryBean = new RmiProxyFactoryBean();
         rmiProxyFactoryBean.setServiceInterface(ClientService.class);
         rmiProxyFactoryBean

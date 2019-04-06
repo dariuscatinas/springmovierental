@@ -1,53 +1,49 @@
 package ui;
 
+
 import common.domain.Client;
 import common.domain.Movie;
 import common.domain.Rental;
 import common.domain.exceptions.*;
-import common.message.utils.MockPredicate;
 import common.service.ClientService;
 import common.service.MovieService;
 import common.service.RentalService;
+
+import java.util.Comparator;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.stream.Stream;
+
 import static common.domain.FilterPredicates.*;
-import static java.lang.Thread.sleep;
+
 
 public class Console {
     private MovieService movieService;
     private ClientService clientService;
     private RentalService rentalService;
     private BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-    private ExecutorService executorService;
 
     public Console(MovieService movieService, ClientService clientService, RentalService rentalService) {
         this.movieService = movieService;
         this.clientService = clientService;
         this.rentalService = rentalService;
-        executorService= Executors.newFixedThreadPool(2);
     }
 
     public Console() {
-        executorService=Executors.newFixedThreadPool(2);
     }
 
-    public void setSerivces(MovieService movieService,ClientService clientService,RentalService rentalService){
-        this.movieService=movieService;
-        this.clientService=clientService;
-        this.rentalService=rentalService;
+    public void setServices(MovieService movieService, ClientService clientService, RentalService rentalService) {
+        this.movieService = movieService;
+        this.clientService = clientService;
+        this.rentalService = rentalService;
     }
 
     private void printCommands() {
@@ -76,8 +72,6 @@ public class Console {
         System.out.println("22. View clients paged");
         System.out.println("23. View Rentals paged");
         System.out.println("24. SetClientPageSize");
-        System.out.println("25. Flood movies");
-        System.out.println("26. Flood clients");
     }
 
     public void run() {
@@ -170,17 +164,12 @@ public class Console {
                 ex.printStackTrace();
             } catch (ClientNotFound | MovieNotFound | RentalNotAdded cnf) {
                 System.out.println(cnf.getMessage());
-            }catch (IOException ioe) {
-                System.out.println("IOException");
-                ioe.printStackTrace();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 System.out.println("An unknown exception has occured");
                 ex.printStackTrace();
             }
         }
     }
-
 
     private void setClientPageSize() {
         int pageSize=readInt("Enter the page size:");
@@ -189,95 +178,50 @@ public class Console {
 
     private void bestMovies() {
 
-        Future<Map<Movie,Set<Rental>>> mMap=rentalService.getMovieRental();
-        executorService.submit(()-> {
-            try {
-                mMap.get().entrySet().stream()
-                        .sorted(Comparator.comparingInt(o -> o.getValue().size() * (-1))).limit(3)
-                        .forEach((c) -> System.out.println(c.getKey().getTitle() + " - " + c.getValue().size()));
-            }catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Map<Movie, Set<Rental>> mMap=rentalService.getMovieRental();
+        mMap.entrySet().stream().sorted(Comparator.comparingInt(o -> o.getValue().size()*(-1))).limit(3)
+                .forEach((c)->System.out.println(c.getKey().getTitle()+" - "+c.getValue().size()));
     }
 
     private void bestClients(){
 
-        Future<Map<Client,Set<Rental>>> cMap=rentalService.getClientRental();
-        executorService.submit(()-> {
-
-            try {
-                cMap.get().entrySet().stream().sorted(Comparator.comparingInt(o -> o.getValue().size() * (-1))).limit(3)
-                        .forEach((c) -> System.out.println(c.getKey().getName() + " - " + c.getValue().size()));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Map<Client,Set<Rental>> cMap=rentalService.getClientRental();
+        cMap.entrySet().stream().sorted(Comparator.comparingInt(o -> o.getValue().size()*(-1))).limit(3)
+                .forEach((c)->System.out.println(c.getKey().getName()+" - "+c.getValue().size()));
     }
 
-    private void updateMovie() throws IOException{
-
+    private void updateMovie() {
         int id=readInt("Give movie ID:");
-        System.out.println("Enter the new title:");
-        String title=reader.readLine();
-        System.out.println("Enter the new Genre:");
-        String genre=reader.readLine();
+        Optional<Movie> iMovie=movieService.findOne(id);
+        iMovie.orElseThrow(()->new MovieNotFound("Movie does not exist"));
+        Movie mov=iMovie.get();
         float newRating=readFloat("Enter the new rating:");
-        Future<Optional<Movie>> m=movieService.update(new Movie(id,title,genre,newRating));
-        executorService.submit(()->{
-            try {
-                Optional<Movie> mo=m.get();
-                        mo.ifPresent(mi->System.out.println("Movie updated"));
-                        mo.orElseThrow(()->new MovieNotFound("Movie not found"));
-
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Optional<Movie> m=movieService.update(new Movie(mov.getId(),mov.getTitle(),mov.getGenre(),newRating));
+        m.ifPresent(mi->System.out.println("Movie updated"));
     }
 
-    private void updateClient() throws IOException{
+    private void updateClient(){
         long id=readInt("Give client ID:");
-        System.out.println("Enter the new name:");
-        String name=reader.readLine();
-        System.out.println("Enter the new email:");
-        String email=reader.readLine();
+        Optional<Client> iClient=clientService.findOne(id);
+        iClient.orElseThrow(()->new ClientNotFound("Client does not exist"));
+        Client client=iClient.get();
         int newAge=readInt("Enter the new age:");
-        Future<Optional<Client>> m=clientService.update(new Client(id,name,email,newAge));
-        executorService.submit(()->{
-            try {
-                Optional<Client> mo=m.get();
-                mo.ifPresent(mi->System.out.println("Client updated"));
-                mo.orElseThrow(()->new ClientNotFound("Client not found"));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Optional<Client> m=clientService.update(new Client(client.getId(),client.getName(),client.getEmail(),newAge));
+        m.ifPresent(mi->System.out.println("Client updated"));
+
     }
 
     private void clientStatistics(){
-      Future<Map<Client,Set<Rental>>> clientRentals=rentalService.getClientRental();
-      executorService.submit(()->{
-          System.out.println("Client name - Number of rentals");
-          try {
-              clientRentals.get().forEach((c,s)->System.out.println(c.getName()+" - "+s.size()));
-          } catch (InterruptedException | ExecutionException e) {
-              e.printStackTrace();
-          }
+      Map<Client,Set<Rental>> clientRentals=rentalService.getClientRental();
+      System.out.println("Client name - Number of rentals");
+      clientRentals.forEach((c,s)->System.out.println(c.getName()+" - "+s.size()));
 
-      });
     }
 
     private  void movieStatistics(){
-        Future<Map<Movie,Set<Rental>>> movieRentals=rentalService.getMovieRental();
-        executorService.submit(()->{
-            System.out.println("Movie name - Number of rentals");
-            try {
-                movieRentals.get().forEach((c,s)->System.out.println(c.getTitle()+" - "+s.size()));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Map<Movie,Set<Rental>> movieRentals=rentalService.getMovieRental();
+        System.out.println("Movie name - Number of rentals");
+        movieRentals.forEach((c,s)->System.out.println(c.getTitle()+" - "+s.size()));
     }
 
     private Client readClient() throws IOException {
@@ -310,141 +254,78 @@ public class Console {
     private void addMovie() throws IOException{
 
         Movie m = readMovie();
-        Future<Optional<Movie>> aMovie = movieService.addMovie(m);
-        executorService.submit(()->{
-            try {
-                Optional<Movie> mo = aMovie.get();
-                mo.ifPresent(mi -> System.out.println("Movie already exists"));
-                mo.orElseThrow(() -> new MovieAdded("Movie added"));
-            } catch (MovieAdded ma) {
-                System.out.println(ma.getMessage());
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
-
+        Optional<Movie> aMovie = movieService.addMovie(m);
+        try {
+            aMovie.ifPresent(mo -> System.out.println("Movie already exists"));
+            aMovie.orElseThrow(() -> new MovieAdded("Movie added"));
+        } catch (MovieAdded ma) {
+            System.out.println(ma.getMessage());
+        }
     }
 
     private void listAllMovies() {
-        executorService.submit(() -> {
-            try {
-                movieService.getAllMovies().get().forEach(m -> System.out.println(m.toString()));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        movieService.getAllMovies().forEach(m -> System.out.println(m.toString()));
     }
 
     private void listAllMoviesPaged(){
-        Future<Stream<Movie>> movies = movieService.findAllPaged();
-        executorService.submit(()->{
-            try {
-                movies.get().forEach(System.out::println);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Stream<Movie> movies = movieService.findAllPaged();
+
+        movies.forEach(System.out::println);
 
     }
 
     private void listAllClientsPaged(){
-        Future<Stream<Client>> clients=clientService.findAllPaged();
-        executorService.submit(()->{
-            try {
-                clients.get().forEach(System.out::println);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Stream<Client> clients=clientService.findAllPaged();
+        clients.forEach(System.out::println);
     }
 
     private void listAllRentalsPaged(){
-        Future<Stream<Rental>> rentals=rentalService.findAllPaged();
-        executorService.submit(()->{
-            try {
-                rentals.get().forEach(System.out::println);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Stream<Rental> rentals=rentalService.findAllPaged();
+        rentals.forEach(System.out::println);
     }
 
     private void deleteMovie() {
         int ID = readInt("Give movie ID:");
-        Future<Optional<Movie>> dMovie = movieService.deleteMovie(ID);
-        executorService.submit(()->{
-            try {
-                Optional<Movie> mo=dMovie.get();
-                mo.ifPresent(m -> System.out.println("Movie deleted"));
-                mo.orElseThrow(() -> new MovieNotFound("Movie not found, nothing deleted"));
-            }catch (MovieNotFound mnf){
-                System.out.println(mnf.getMessage());
-            }
-            catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Optional<Movie> dMovie = movieService.deleteMovie(ID);
+        dMovie.ifPresent(m -> System.out.println("Movie deleted"));
+        dMovie.orElseThrow(() -> new MovieNotFound("Movie not found, nothing deleted"));
 
     }
 
     private void addClient() throws IOException{
         Client c = readClient();
-        Future<Optional<Client>> aClient = clientService.addClient(c);
-        executorService.submit(()->{
-            try {
-                Optional<Client> mo=aClient.get();
-                mo.ifPresent(cl -> System.out.println("Client already exists"));
-                mo.orElseThrow(() -> new ClientAdded("Client added"));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }catch (ClientAdded ca){
-                System.out.println(ca.getMessage());
-            }
-        });
+        Optional<Client> aClient = clientService.addClient(c);
+        try {
+            aClient.ifPresent(cl -> System.out.println("Client already exists"));
+            aClient.orElseThrow(() -> new ClientAdded("Client added"));
+        } catch (ClientAdded ca) {
+            System.out.println(ca.getMessage());
+        }
     }
 
     private void listAllClients() {
-        executorService.submit(()-> {
-            try {
-                clientService.getAllClients().get().forEach(c -> System.out.println(c + "\n"));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        clientService.getAllClients().forEach(c -> System.out.println(c + "\n"));
     }
 
     private void removeClient() {
         long cnp;
         boolean ok = false;
-        while (!ok) try {
-            System.out.print("Give client CNP:");
-            cnp = Long.parseLong(reader.readLine());
-            Future<Optional<Client>> dClient = clientService.deleteClient(cnp);
-            executorService.submit(() -> {
-                try {
-                    Optional<Client> mo = dClient.get();
-                    mo.ifPresent(c -> System.out.println("Client deleted"));
-                    mo.orElseThrow(() -> new ClientNotFound("Client not found, nothing deleted"));
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }catch (ClientNotFound cnf){
-                    System.out.println(cnf.getMessage());
-                }
-            });
-            ok = true;
-        } catch (NumberFormatException | IOException ex) {
-            System.out.println("CNP format not correct");
+        while (!ok) {
+            try {
+                System.out.print("Give client CNP:");
+                cnp = Long.parseLong(reader.readLine());
+                Optional<Client> dClient = clientService.deleteClient(cnp);
+                dClient.ifPresent(c -> System.out.println("Client deleted"));
+                dClient.orElseThrow(() -> new ClientNotFound("Client not found, nothing deleted"));
+                ok = true;
+            } catch (NumberFormatException | IOException ex) {
+                System.out.println("CNP format not correct");
+            }
         }
     }
 
     private void listAllRentals() {
-        executorService.submit(()->{
-            try {
-                rentalService.getAllRentals().get().forEach(System.out::println);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        rentalService.getAllRentals().forEach(System.out::println);
     }
 
     private void addRental() {
@@ -466,19 +347,12 @@ public class Console {
                 System.out.println("Invalid date. Try again.");
             }
         }
-        Future<Optional<Rental>> rental = rentalService.save(cnp, mID, startDate, days);
-        executorService.submit(()->{
-            try {
-                Optional<Rental> mo=rental.get();
-                if (mo.isPresent()) {
-                    System.out.println("Rental already present.");
-                } else {
-                    System.out.println("Rental added successfully.");
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Optional<Rental> rental = rentalService.save(cnp, mID, startDate, days);
+        if (rental.isPresent()) {
+            System.out.println("Rental already present.");
+        } else {
+            System.out.println("Rental added successfully.");
+        }
     }
 
     private int readInt(String message) {
@@ -528,90 +402,51 @@ public class Console {
 
     private void filterMoviesRating() {
         float rating = readFloat("Give rating(>):");
-        Future<Set<Movie>> m=movieService.filterCustom(filterMR(rating));
-        executorService.submit(()->{
-            try {
-                Set<Movie> mo=m.get();
-                Optional.of(mo.size()).filter(s->s==0).ifPresent(x->System.out.println("No movies above that rating"));
-                mo.forEach(System.out::println);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Set<Movie> m=movieService.filterCustom(filterMR(rating));
+        Optional.of(m.size()).filter(s->s==0).ifPresent(x->System.out.println("No movies above that rating"));
+        m.forEach(System.out::println);
     }
 
     private void filterMoviesGenre() throws IOException {
         System.out.println("Give genre: ");
         String genre = reader.readLine();
-        Future<Set<Movie>> m=movieService.filterCustom(filterMG(genre));
-        executorService.submit(()->{
-            try {
-                Set<Movie> mo=m.get();
-                Optional<Integer> o=Optional.of(mo.size()).filter(s->s==0);
-                o.ifPresent(x->System.out.println("No movies with that genre"));
-                mo.forEach(System.out::println);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Set<Movie> m=movieService.filterCustom(filterMG(genre));
+        Optional<Integer> o=Optional.of(m.size()).filter(s->s==0);
+        o.ifPresent(x->System.out.println("No movies with that genre"));
+        m.forEach(System.out::println);
     }
 
     private void filterClientsAge() throws IOException {
         int age = readInt("Give age:");
         System.out.println("Specify if you want clients younger or older than the age(>, <):");
         String sign = reader.readLine();
-        Future<Set<Client>> co=clientService.filterCustom(filterCA(age,sign));
-        executorService.submit(()->{
-            try {
-                Set<Client> c=co.get();
-                Optional.of(c.size()).filter(s->s==0).ifPresent(x->System.out.println("No clients above/below that age"));
-                c.forEach(ce -> System.out.println(ce + "\n"));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Set<Client> c=clientService.filterCustom(filterCA(age,sign));
+        Optional.of(c.size()).filter(s->s==0).ifPresent(x->System.out.println("No clients above/below that age"));
+
+        c.forEach(ce -> System.out.println(ce + "\n"));
     }
 
     private void filterRentalDuration() throws IOException {
         int duration = readInt("Give duration:");
         System.out.println("Specify if you want rentals' with less or more than the given duration(>, <):");
         String sign = reader.readLine();
-        Future<Set<Rental>> ro=rentalService.filterCustom(filterRD(duration,sign));
-        executorService.submit(()->{
-            try {
-                Set<Rental> re=ro.get();
-                Optional.of(re.size()).filter(s->s==0).ifPresent(x->System.out.println("No rentals above/below that duration"));
-                re.forEach(r -> System.out.println(r + "\n"));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Set<Rental> re=rentalService.filterCustom(filterRD(duration,sign));
+        Optional.of(re.size()).filter(s->s==0).ifPresent(x->System.out.println("No rentals above/below that duration"));
+
+        re.forEach(r -> System.out.println(r + "\n"));
     }
     private void filterRentalClient(){
         long cID = readLong("Give client CNP:");
-        Future<Set<Rental>> ri=rentalService.filterCustom(filterRC(cID));
-        executorService.submit(()->{
-            try {
-                Set<Rental> re=ri.get();
-                Optional.of(re.size()).filter(s->s==0).ifPresent(x->System.out.println("No rentals for that client"));
-                re.forEach(c -> System.out.println(c + "\n"));
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Set<Rental> re=rentalService.filterCustom(filterRC(cID));
+        Optional.of(re.size()).filter(s->s==0).ifPresent(x->System.out.println("No rentals for that client"));
+        re.forEach(c -> System.out.println(c + "\n"));
     }
     private void filterRentalMovie(){
         int mID = readInt("Give movie ID: ");
-        Future<Set<Rental>> ri=rentalService.filterCustom(filterRM(mID));
-        executorService.submit(()->{
-            try {
-                Set<Rental> re=ri.get();
-                Optional.of(re.size()).filter(s->s==0).ifPresent(x->System.out.println("No rentals for that movie"));
-                re.forEach(System.out::println);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        Set<Rental> re=rentalService.filterCustom(filterRM(mID));
+        Optional.of(re.size()).filter(s->s==0).ifPresent(x->System.out.println("No rentals for that movie"));
+
+        re.forEach(System.out::println);
     }
 }
 
