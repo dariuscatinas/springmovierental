@@ -4,6 +4,7 @@ import common.domain.Client;
 import common.domain.exceptions.MovieRentalException;
 import common.domain.exceptions.ValidatorException;
 import common.service.ClientService;
+import org.springframework.jdbc.core.JdbcOperations;
 import pagination.Page;
 import pagination.PageGenerator;
 import repository.PagingRepository;

@@ -9,17 +9,21 @@ import common.domain.validators.RentalValidator;
 import common.service.ClientService;
 import common.service.MovieService;
 import common.service.RentalService;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.remoting.rmi.RmiServiceExporter;
-import repository.DBGenericRepo;
-import repository.Repository;
+import repository.*;
 import repository.util.db.ClientDB;
 import repository.util.db.MovieDB;
 import repository.util.db.RentalDB;
 import service.Server_ClientService;
 import service.Server_MovieService;
 import service.Server_RentalService;
+
+import javax.sql.DataSource;
 
 
 @Configuration
@@ -42,20 +46,17 @@ public class ServerConfig {
 
     @Bean
     Repository<Long, Client> clientRepository(){
-        return new DBGenericRepo<>(ClientDB::getClientSelect,ClientDB::findAll,
-                ClientDB::saveClient,ClientDB::updateClient,ClientDB::findOneClient,ClientDB::deleteClient,clientValidator());
+        return new JdbcClientRepo(createJdbc(), clientValidator());
     }
 
     @Bean
     Repository<Integer, Movie> movieRepository(){
-        return new DBGenericRepo<>(MovieDB::getMovieSelect,MovieDB::findAll,
-                MovieDB::saveMovie,MovieDB::updateMovie,MovieDB::findOneMovie,MovieDB::deleteMovie,movieValidator());
+        return new JdbcMovieRepo(createJdbc(), movieValidator());
     }
 
     @Bean
-    Repository<Integer, Rental> rentalRepository(){
-        return new DBGenericRepo<>(RentalDB::getRentalSelect,RentalDB::findAll,
-                RentalDB::saveRental,RentalDB::updateRental,RentalDB::findOneRental,RentalDB::deleteRental,rentalValidator());
+    Repository<Integer, Rental> rentalRepository() {
+        return new JdbcRentalRepo(createJdbc(), rentalValidator());
     }
 
     @Bean
@@ -86,6 +87,30 @@ public class ServerConfig {
     ClientService clientService() {
         return new Server_ClientService(clientRepository());
     }
+
+    @Bean JdbcOperations createJdbc() {
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+
+        jdbcTemplate.setDataSource(dataSource());
+
+        return jdbcTemplate;
+    }
+
+
+    @Bean
+    DataSource dataSource() {
+        BasicDataSource basicDataSource = new BasicDataSource();
+
+        //TODO use env props (or property files)
+        basicDataSource.setUrl("jdbc:postgresql://localhost:5432/movierental");
+        basicDataSource.setUsername("admin");
+        basicDataSource.setPassword("12345678");
+        basicDataSource.setInitialSize(2);
+
+        return basicDataSource;
+    }
+
 
     @Bean
     RmiServiceExporter rmiServiceExporterRental() {

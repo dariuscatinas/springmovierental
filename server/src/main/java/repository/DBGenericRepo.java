@@ -24,9 +24,9 @@ public class DBGenericRepo<ID, T extends BaseEntity<ID>> implements PagingReposi
     private BiFunction<Connection, T, PreparedStatement> updateHandler;
     private BiFunction<Connection,ID,  T> findOneHandler;
     private BiFunction<Connection, ID, T> deleteHandler;
-    private static final String USERNAME = "postgres";
-    private static final String PASSWORD = "postgres";
-    private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
+    private static final String USERNAME = "admin";
+    private static final String PASSWORD = "12345678";
+    private static final String URL = "jdbc:postgresql://localhost:5432/movierental";
     private Validator<T> validator;
 
     public DBGenericRepo(Supplier<String> selectSupplier, Function<ResultSet, List<T>> allCreator,
