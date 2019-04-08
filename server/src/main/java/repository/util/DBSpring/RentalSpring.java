@@ -9,6 +9,11 @@ import java.util.Optional;
 
 public class RentalSpring {
 
+    /**
+     * Delegate to find all rentals from the DB
+     * @param jdbcOperations the DB operations
+     * @return an {@code Iterable} with all the rentals from the DB
+     */
     public static Iterable<Rental> findAll(JdbcOperations jdbcOperations){
         String sql = "select * from rental";
         List<Rental> rentals = jdbcOperations.query(sql, (rs, rowNum) -> {
@@ -23,6 +28,12 @@ public class RentalSpring {
         return rentals;
     }
 
+    /**
+     * Delegate to find a movie from the DB
+     * @param jdbcOperations the DB operations
+     * @param integer the id of the rental to delete
+     * @return an {@code Optional} containg the found rental
+     */
     public static Optional<Rental> findOne(JdbcOperations jdbcOperations,int integer){
         String sql = "select * from rental where id = " + integer;
         Optional<Rental> opt = Optional.empty();
@@ -41,6 +52,12 @@ public class RentalSpring {
         return Optional.ofNullable(rentals.get(0));
     }
 
+    /**
+     * Delegate to add a rental to the DB
+     * @param jdbcOperations the DB operations
+     * @param entity the rental to add to the DB
+     * @return and {@code Optional} null if the entity was added
+     */
     public static Optional<Rental> save(JdbcOperations jdbcOperations,Rental entity){
         if(findOne(jdbcOperations,entity.getId()).isPresent())
             return Optional.empty();
@@ -50,6 +67,12 @@ public class RentalSpring {
         return Optional.of(entity);
     }
 
+    /**
+     * Delegate to delete a rental from the DB
+     * @param jdbcOperations the DB operations
+     * @param integer the id of the rental to delete
+     * @return an {@code Optional} containing the deleted rental
+     */
     public static Optional<Rental> delete(JdbcOperations jdbcOperations,int integer){
         Optional<Rental> entity = findOne(jdbcOperations,integer);
         if(!entity.isPresent()){
@@ -60,6 +83,12 @@ public class RentalSpring {
         return entity;
     }
 
+    /**
+     * Delegate to update a rental in the DB
+     * @param jdbcOperations the DB operations
+     * @param rental the rental with the new information
+     * @return an {@code Optional} containing the updated rental
+     */
     public static Optional<Rental> update(JdbcOperations jdbcOperations,Rental rental){
         if(!findOne(jdbcOperations,rental.getId()).isPresent())
             return Optional.of(rental);

@@ -8,6 +8,11 @@ import java.util.Optional;
 
 public class MovieSpring {
 
+    /**
+     * Delegate to find all movies from the DB
+     * @param jdbcOperations the DB operations
+     * @return an {@code Iterable} containing all movies from the DB
+     */
     public static Iterable<Movie> findAll(JdbcOperations jdbcOperations){
         String sql = "select * from movie";
         List<Movie> movies = jdbcOperations.query(sql, (rs, rowNum) -> {
@@ -21,6 +26,12 @@ public class MovieSpring {
         return movies;
     }
 
+    /**
+     * Delegate to find a movie in the DB
+     * @param jdbcOperations the DB operations
+     * @param integer the id of the movie to find
+     * @return an {@code Optional} with the movie or empty
+     */
     public static Optional<Movie> findOne(JdbcOperations jdbcOperations,int integer){
         String sql = "select * from movie where id = " + integer;
         Optional<Movie> opt = Optional.empty();
@@ -38,6 +49,12 @@ public class MovieSpring {
         return Optional.ofNullable(movies.get(0));
     }
 
+    /**
+     * Delegate to save a movie in the DB
+     * @param jdbcOperations the DB operations
+     * @param entity the movie to add to the DB
+     * @return an {@code Optional} null if the movie was added or contains the movie otherwise
+     */
     public static Optional<Movie> save(JdbcOperations jdbcOperations,Movie entity){
         if(findOne(jdbcOperations,entity.getId()).isPresent())
             return Optional.empty();
@@ -46,6 +63,12 @@ public class MovieSpring {
         return Optional.of(entity);
     }
 
+    /**
+     * Delegate to delete a movie from the DB
+     * @param jdbcOperations the DB operations
+     * @param integer the id of the movie to delete
+     * @return an {@code Optional} containing the deleted movie
+     */
     public static Optional<Movie> delete(JdbcOperations jdbcOperations,int integer){
         Optional<Movie> entity = findOne(jdbcOperations,integer);
         if(!entity.isPresent()){
@@ -56,6 +79,12 @@ public class MovieSpring {
         return entity;
     }
 
+    /**
+     * Delegate to update a movie in the DB
+     * @param jdbcOperations the DB operations
+     * @param movie the movie with the new info
+     * @return an {@code Optional} with the updated movie
+     */
     public static Optional<Movie> update(JdbcOperations jdbcOperations,Movie movie){
         if(!findOne(jdbcOperations,movie.getId()).isPresent())
             return Optional.of(movie);

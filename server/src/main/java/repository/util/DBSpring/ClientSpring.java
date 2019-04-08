@@ -8,6 +8,11 @@ import java.util.Optional;
 
 public class ClientSpring {
 
+    /**
+     * Delegate to find all the clients from the DB
+     * @param jdbcOperations the DB operations
+     * @return an {@code Iterable<Client>} containing all the clients from the DB
+     */
     public static Iterable<Client> findAll(JdbcOperations jdbcOperations){
 
         String sql = "select * from client";
@@ -23,6 +28,12 @@ public class ClientSpring {
 
     }
 
+    /**
+     * Delegate to find a client from the DB
+     * @param jdbcOperations the DB operations
+     * @param aLong the id of the client to find
+     * @return an {@code Optional} which contains the client if found or empty
+     */
     public static Optional<Client> findOne(JdbcOperations jdbcOperations,Long aLong){
         String sql = "select * from client where id = " + aLong;
         Optional<Client> opt = Optional.empty();
@@ -40,6 +51,12 @@ public class ClientSpring {
         return Optional.ofNullable(clients.get(0));
     }
 
+    /**
+     * Delegate to save a client to the DB
+     * @param jdbcOperations the DB operations
+     * @param entity the client to add to the DB
+     * @return an {@code Optional} which is empty if the client was saved or contains the client
+     */
     public static Optional<Client> save(JdbcOperations jdbcOperations,Client entity) {
         if(findOne(jdbcOperations,entity.getId()).isPresent())
             return Optional.empty();
@@ -48,6 +65,12 @@ public class ClientSpring {
         return Optional.of(entity);
     }
 
+    /**
+     * Delegate to delete a client from the DB
+     * @param jdbcOperations the DB operations
+     * @param aLong the ID of the client to delete
+     * @return an {@code Optional} with the deleted client or empty if not found
+     */
     public static Optional<Client> delete(JdbcOperations jdbcOperations,Long aLong){
         Optional<Client> entity = findOne(jdbcOperations,aLong);
         if(!entity.isPresent()){
@@ -58,6 +81,12 @@ public class ClientSpring {
         return entity;
     }
 
+    /**
+     * Delegate to update a client from the DB
+     * @param jdbcOperations th DB operations
+     * @param client the client with updated infor
+     * @return an {@code Optional} containing the updated client
+     */
     public static Optional<Client> update(JdbcOperations jdbcOperations,Client client){
         if(!findOne(jdbcOperations,client.getId()).isPresent())
             return Optional.of(client);
