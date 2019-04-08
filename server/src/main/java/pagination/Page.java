@@ -15,8 +15,8 @@ public class Page<T extends BaseEntity> {
         this.nextPage = nextPage;
     }
 
-    public Stream<T> getElements(){
-        return elements.stream();
+    public List<T> getElements(){
+        return elements;
     }
     public PageGenerator getNextPage(){
         return nextPage;

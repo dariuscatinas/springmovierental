@@ -3,6 +3,8 @@ import common.domain.Movie;
 import common.domain.exceptions.ValidatorException;
 import common.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -45,7 +47,7 @@ public class Client_MovieService implements MovieService {
     }
 
     @Override
-    public Stream<Movie> findAllPaged() {
+    public List<Movie> findAllPaged() {
         return movieService.findAllPaged();
     }
 

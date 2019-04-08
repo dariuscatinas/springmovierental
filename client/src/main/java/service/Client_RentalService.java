@@ -6,6 +6,7 @@ import common.service.RentalService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class Client_RentalService implements RentalService{
     }
 
     @Override
-    public Stream<Rental> findAllPaged() {
+    public List<Rental> findAllPaged() {
         return rentalService.findAllPaged();
     }
 }

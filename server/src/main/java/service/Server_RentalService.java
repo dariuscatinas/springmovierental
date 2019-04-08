@@ -13,6 +13,7 @@ import repository.PagingRepository;
 import repository.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -110,13 +111,13 @@ public class Server_RentalService implements RentalService {
     }
 
 
-    public Stream<Rental> findAllPaged(){
+    public List<Rental> findAllPaged(){
         if(!(rentalRepository instanceof PagingRepository)){
             throw new MovieRentalException("Cannot use this functionality");
         }
         Page<Rental> rentalPage = ((PagingRepository<Integer, Rental>) rentalRepository).findAll(pageGenerator);
         pageGenerator = rentalPage.getNextPage();
-        Optional.of(rentalPage.getElements().count())
+        Optional.of(rentalPage.getElements().size())
                 .filter(c->c==0)
                 .ifPresent(c->pageGenerator=new PageGenerator());
 

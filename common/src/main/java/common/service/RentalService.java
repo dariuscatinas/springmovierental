@@ -6,6 +6,7 @@ import common.domain.Rental;
 import common.message.utils.MockPredicate;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -65,6 +66,6 @@ public interface RentalService {
      */
     public Map<Client,Set<Rental>> getClientRental();
 
-    public Stream<Rental> findAllPaged();
+    public List<Rental> findAllPaged();
 
 }

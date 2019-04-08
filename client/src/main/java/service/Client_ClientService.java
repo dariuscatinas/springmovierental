@@ -3,6 +3,8 @@ import common.domain.Client;
 import common.domain.exceptions.ValidatorException;
 import common.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -45,7 +47,7 @@ public class Client_ClientService implements ClientService{
     }
 
     @Override
-    public Stream<Client> findAllPaged() {
+    public List<Client> findAllPaged() {
         return clientService.findAllPaged();
     }
 

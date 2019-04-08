@@ -10,6 +10,7 @@ import pagination.PageGenerator;
 import repository.PagingRepository;
 import repository.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -68,16 +69,19 @@ public class Server_ClientService implements ClientService {
         return repository.findOne(cnp);
     }
 
-    public Stream<Client> findAllPaged(){
+    public List<Client> findAllPaged(){
+
         if(!(repository instanceof PagingRepository)){
             throw new MovieRentalException("Cannot use this functionality");
         }
+        System.out.println("?????");
         Page<Client> clientPage = ((PagingRepository<Long, Client>) repository).findAll(pageGenerator);
         pageGenerator = clientPage.getNextPage();
-        Optional.of(clientPage.getElements().count())
+        Optional.of(clientPage.getElements().size())
                 .filter(c->c==0)
                 .ifPresent(c->pageGenerator=new PageGenerator());
 
+        System.out.println(clientPage.getElements());
         return clientPage.getElements();
     }
     public void setPageSize(int size){

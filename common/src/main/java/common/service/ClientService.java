@@ -4,6 +4,7 @@ import common.domain.Client;
 import common.domain.exceptions.ValidatorException;
 import common.message.utils.MockPredicate;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -54,7 +55,7 @@ public interface ClientService {
      */
     public Optional<Client> findOne(long cnp);
 
-    public Stream<Client> findAllPaged();
+    public List<Client> findAllPaged();
 
     void setPageSize(int size);
 }

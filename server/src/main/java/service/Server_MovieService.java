@@ -9,6 +9,7 @@ import pagination.PageGenerator;
 import repository.PagingRepository;
 import repository.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -61,13 +62,13 @@ public class Server_MovieService implements MovieService {
         return repo.findOne(id);
     }
 
-    public Stream<Movie> findAllPaged(){
+    public List<Movie> findAllPaged(){
         if(!(repo instanceof PagingRepository)){
             throw new MovieRentalException("Cannot use this functionality");
         }
         Page<Movie> moviePage = ((PagingRepository<Integer, Movie>) repo).findAll(pageGenerator);
         pageGenerator = moviePage.getNextPage();
-        Optional.of(moviePage.getElements().count())
+        Optional.of(moviePage.getElements().size())
                 .filter(c->c==0)
                 .ifPresent(c->pageGenerator=new PageGenerator());
 

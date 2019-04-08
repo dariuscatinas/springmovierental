@@ -4,6 +4,7 @@ import common.domain.Movie;
 import common.domain.exceptions.ValidatorException;
 import common.message.utils.MockPredicate;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -57,7 +58,7 @@ public interface MovieService {
      */
     public Optional<Movie> findOne(int id);
 
-    public Stream<Movie> findAllPaged();
+    public List<Movie> findAllPaged();
 
     public void setPageSize(int size);
 }
