@@ -12,6 +12,7 @@ import repository.PagingRepository;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated
 public class JdbcClientRepo implements PagingRepository<Long, Client> {
     @Autowired
     private JdbcOperations jdbcOperations;

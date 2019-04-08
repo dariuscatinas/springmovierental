@@ -16,6 +16,9 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.remoting.rmi.RmiServiceExporter;
 import repository.*;
+import repository.util.DBSpring.ClientSpring;
+import repository.util.DBSpring.MovieSpring;
+import repository.util.DBSpring.RentalSpring;
 import repository.util.db.ClientDB;
 import repository.util.db.MovieDB;
 import repository.util.db.RentalDB;
@@ -46,17 +49,21 @@ public class ServerConfig {
 
     @Bean
     Repository<Long, Client> clientRepository(){
-        return new JdbcClientRepo(createJdbc(), clientValidator());
+        return new DBSpring<>(ClientSpring::findAll,ClientSpring::findOne
+                ,ClientSpring::save,ClientSpring::delete,ClientSpring::update,clientValidator());
     }
 
     @Bean
     Repository<Integer, Movie> movieRepository(){
-        return new JdbcMovieRepo(createJdbc(), movieValidator());
+        return new DBSpring<>(MovieSpring::findAll,MovieSpring::findOne,
+                MovieSpring::save,MovieSpring::delete,MovieSpring::update,movieValidator());
     }
 
     @Bean
-    Repository<Integer, Rental> rentalRepository() {
-        return new JdbcRentalRepo(createJdbc(), rentalValidator());
+    Repository<Integer, Rental> rentalRepository()
+    {
+        return new DBSpring<>(RentalSpring::findAll,RentalSpring::findOne,RentalSpring::save,
+                RentalSpring::delete,RentalSpring::update, rentalValidator());
     }
 
     @Bean
@@ -103,9 +110,9 @@ public class ServerConfig {
         BasicDataSource basicDataSource = new BasicDataSource();
 
         //TODO use env props (or property files)
-        basicDataSource.setUrl("jdbc:postgresql://localhost:5432/movierental");
-        basicDataSource.setUsername("admin");
-        basicDataSource.setPassword("12345678");
+        basicDataSource.setUrl("jdbc:postgresql://localhost:5432/postgres");
+        basicDataSource.setUsername("postgres");
+        basicDataSource.setPassword("postgres");
         basicDataSource.setInitialSize(2);
 
         return basicDataSource;

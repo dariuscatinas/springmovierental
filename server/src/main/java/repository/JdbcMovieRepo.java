@@ -12,6 +12,7 @@ import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated
 public class JdbcMovieRepo implements PagingRepository<Integer, Movie> {
     @Autowired
     private JdbcOperations jdbcOperations;
