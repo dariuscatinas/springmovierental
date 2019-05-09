@@ -109,10 +109,9 @@ public class ServerConfig {
     DataSource dataSource() {
         BasicDataSource basicDataSource = new BasicDataSource();
 
-        //TODO use env props (or property files)
-        basicDataSource.setUrl("jdbc:postgresql://localhost:5432/postgres");
-        basicDataSource.setUsername("postgres");
-        basicDataSource.setPassword("postgres");
+        basicDataSource.setUrl("jdbc:postgresql://localhost:5432/movierental");
+        basicDataSource.setUsername("admin");
+        basicDataSource.setPassword("12345678");
         basicDataSource.setInitialSize(2);
 
         return basicDataSource;

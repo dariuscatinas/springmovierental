@@ -39,7 +39,7 @@ public class JdbcMovieRepo implements PagingRepository<Integer, Movie> {
 
             return new Movie(id, title, genre, rating);
         });
-        if(movies.size() == 0){
+        if(movies.isEmpty()){
             return Optional.empty();
         }
         return Optional.ofNullable(movies.get(0));

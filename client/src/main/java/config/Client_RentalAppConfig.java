@@ -14,12 +14,12 @@ public class Client_RentalAppConfig {
         return new Client_RentalService();
     }
 
-    @Bean
-    RmiProxyFactoryBean rmiProxyFactoryBeanRental(){
-        RmiProxyFactoryBean rmiProxyFactoryBean = new RmiProxyFactoryBean();
-        rmiProxyFactoryBean.setServiceInterface(RentalService.class);
-        rmiProxyFactoryBean
-                .setServiceUrl("rmi://localhost:1099/RentalService");
-        return rmiProxyFactoryBean;
-    }
+//    @Bean
+//    RmiProxyFactoryBean rmiProxyFactoryBeanRental(){
+//        RmiProxyFactoryBean rmiProxyFactoryBean = new RmiProxyFactoryBean();
+//        rmiProxyFactoryBean.setServiceInterface(RentalService.class);
+//        rmiProxyFactoryBean
+//                .setServiceUrl("rmi://localhost:1099/RentalService");
+//        return rmiProxyFactoryBean;
+//    }
 }

@@ -15,15 +15,15 @@ public class Client_MovieAppConfig {
         return new Client_MovieService();
     }
 
-    @Bean
-    RmiProxyFactoryBean rmiProxyFactoryBeanMovie() {
-//        System.out.println("intrat aici??");
-        RmiProxyFactoryBean rmiProxyFactoryBean = new RmiProxyFactoryBean();
-        rmiProxyFactoryBean.setServiceInterface(MovieService.class);
-        rmiProxyFactoryBean
-                .setServiceUrl("rmi://localhost:1099/MovieService");
-//        System.out.println("???");
-        return rmiProxyFactoryBean;
-    }
+//    @Bean
+//    RmiProxyFactoryBean rmiProxyFactoryBeanMovie() {
+////        System.out.println("intrat aici??");
+//        RmiProxyFactoryBean rmiProxyFactoryBean = new RmiProxyFactoryBean();
+//        rmiProxyFactoryBean.setServiceInterface(MovieService.class);
+//        rmiProxyFactoryBean
+//                .setServiceUrl("rmi://localhost:1099/MovieService");
+////        System.out.println("???");
+//        return rmiProxyFactoryBean;
+//    }
 
 }

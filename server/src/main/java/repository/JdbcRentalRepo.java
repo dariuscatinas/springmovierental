@@ -16,8 +16,9 @@ import java.util.Optional;
 public class JdbcRentalRepo implements PagingRepository<Integer, Rental> {
     @Autowired
     private JdbcOperations jdbcOperations;
-    private RentalValidator rentalValidator;
     @Autowired
+    private RentalValidator rentalValidator;
+
     public JdbcRentalRepo(JdbcOperations op, RentalValidator validator) {
         this.jdbcOperations = op;
         this.rentalValidator = validator;
@@ -41,7 +42,7 @@ public class JdbcRentalRepo implements PagingRepository<Integer, Rental> {
 
             return new Rental(id, cid, mid, startDate, endDate);
         });
-        if(rentals.size() == 0){
+        if(rentals.isEmpty()){
             return Optional.empty();
         }
         return Optional.ofNullable(rentals.get(0));
